@@ -1,4 +1,3 @@
-// dashboard_screen.dart
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -9,7 +8,7 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.blueAccent, // Primary color
       ),
       drawer: _buildDrawer(context),
       body: Padding(
@@ -27,7 +26,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // Build the overview section with animated cards
+  // Build the overview section with refined cards
   Widget _buildOverviewCards(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,70 +34,71 @@ class DashboardScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildAnimatedCard('Total Users', '350', Colors.blue),
-            _buildAnimatedCard('Active Users', '280', Colors.green),
-            _buildAnimatedCard('Total Bills', '1000', Colors.orange),
+            _buildCard('Total Users', '350', Colors.blueAccent),
+            _buildCard('Active Users', '280', Colors.teal),
+            _buildCard('Total Bills', '1000', Colors.orangeAccent),
           ],
         ),
         const SizedBox(height: 30),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildAnimatedCard('Unpaid Bills', '500', Colors.red),
-            _buildAnimatedCard('Total Payments', '1500', Colors.purple),
-            _buildAnimatedCard('Reports', '80', Colors.yellow),
+            _buildCard('Unpaid Bills', '500', Colors.redAccent),
+            _buildCard('Total Payments', '1500', Colors.purpleAccent),
+            _buildCard('Reports', '80', Colors.amber),
           ],
         ),
       ],
     );
   }
 
-  // Animated card with scale effect
-  Widget _buildAnimatedCard(String title, String value, Color color) {
-    return AnimatedContainer(
-      duration: const Duration(seconds: 1),
-      curve: Curves.easeInOut,
+  // Refined card style
+  Widget _buildCard(String title, String value, Color iconColor) {
+    return Container(
       width: 100,
       height: 120,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.grey.withOpacity(0.2),
             spreadRadius: 2,
-            blurRadius: 4,
-            offset: Offset(0, 2), // Changes the position of the shadow
+            blurRadius: 5,
+            offset: const Offset(0, 3), // Position of shadow
           ),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Icon(Icons.circle, color: iconColor, size: 24),
+          const SizedBox(height: 10),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 14, color: Colors.black54),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             value,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, color: color, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
           ),
         ],
       ),
     );
   }
 
-  // Build the recent activity section
+  // Build recent activity section
   Widget _buildRecentActivitySection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Recent Activity',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
         const SizedBox(height: 10),
         _buildRecentActivityItem('New User Registered', 'John Doe'),
@@ -109,20 +109,20 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // Build a recent activity item
+  // Recent activity item
   Widget _buildRecentActivityItem(String action, String user) {
     return ListTile(
-      leading: const Icon(Icons.notification_important, color: Colors.blue),
-      title: Text(action),
-      subtitle: Text('User: $user'),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      leading: const Icon(Icons.notification_important, color: Colors.blueAccent),
+      title: Text(action, style: const TextStyle(color: Colors.black87)),
+      subtitle: Text('User: $user', style: TextStyle(color: Colors.grey[600])),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
       onTap: () {
         // Navigate to the details page (add navigation here)
       },
     );
   }
 
-  // Build the navigation drawer for the admin panel
+  // Drawer with refined color scheme
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: ListView(
@@ -133,26 +133,26 @@ class DashboardScreen extends StatelessWidget {
             accountEmail: Text('admin@example.com'),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
-              child: Icon(Icons.admin_panel_settings, color: Colors.blue, size: 40),
+              child: Icon(Icons.admin_panel_settings, color: Colors.blueAccent, size: 40),
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.account_circle),
-            title: const Text('Users'),
+            leading: const Icon(Icons.account_circle, color: Colors.blueAccent),
+            title: const Text('Users', style: TextStyle(color: Colors.black87)),
             onTap: () {
               // Navigate to Users page (add navigation here)
             },
           ),
           ListTile(
-            leading: const Icon(Icons.payment),
-            title: const Text('Bills'),
+            leading: const Icon(Icons.payment, color: Colors.blueAccent),
+            title: const Text('Bills', style: TextStyle(color: Colors.black87)),
             onTap: () {
               // Navigate to Bills page (add navigation here)
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            leading: const Icon(Icons.settings, color: Colors.blueAccent),
+            title: const Text('Settings', style: TextStyle(color: Colors.black87)),
             onTap: () {
               // Navigate to Settings page (add navigation here)
             },
