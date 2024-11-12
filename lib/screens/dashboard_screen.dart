@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+// Import your existing pages here
+import 'billing_management_screen.dart';
+import 'meter_reading_screen.dart';
+import 'notifications_screen.dart';
+import 'payments_screen.dart';
+import 'reports_screen.dart';
+import 'user_management_screen.dart';
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -18,7 +26,7 @@ class DashboardScreen extends StatelessWidget {
             children: [
               _buildOverviewCards(context),
               const SizedBox(height: 20),
-              _buildRecentActivitySection(),
+              _buildRecentActivitySection(context),
             ],
           ),
         ),
@@ -35,7 +43,7 @@ class DashboardScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildCard('Total Users', '350', Colors.blueAccent),
-            _buildCard('Active Users', '280', Colors.teal),
+            _buildCard('Active ', '280', Colors.teal),
             _buildCard('Total Bills', '1000', Colors.orangeAccent),
           ],
         ),
@@ -44,7 +52,7 @@ class DashboardScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildCard('Unpaid Bills', '500', Colors.redAccent),
-            _buildCard('Total Payments', '1500', Colors.purpleAccent),
+            _buildCard('Payments', '1500', Colors.purpleAccent),
             _buildCard('Reports', '80', Colors.amber),
           ],
         ),
@@ -92,7 +100,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   // Build recent activity section
-  Widget _buildRecentActivitySection() {
+  Widget _buildRecentActivitySection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -101,28 +109,48 @@ class DashboardScreen extends StatelessWidget {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
         const SizedBox(height: 10),
-        _buildRecentActivityItem('New User Registered', 'John Doe'),
-        _buildRecentActivityItem('Bill Generated', 'User123'),
-        _buildRecentActivityItem('Payment Received', 'User456'),
-        _buildRecentActivityItem('Meter Reading Added', 'User789'),
+        _buildRecentActivityItem('New User Registered', 'John Doe', context),
+        _buildRecentActivityItem('Bill Generated', 'User123', context),
+        _buildRecentActivityItem('Payment Received', 'User456', context),
+        _buildRecentActivityItem('Meter Reading Added', 'User789', context),
       ],
     );
   }
 
   // Recent activity item
-  Widget _buildRecentActivityItem(String action, String user) {
+  Widget _buildRecentActivityItem(String action, String user, BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.notification_important, color: Colors.blueAccent),
       title: Text(action, style: const TextStyle(color: Colors.black87)),
       subtitle: Text('User: $user', style: TextStyle(color: Colors.grey[600])),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
       onTap: () {
-        // Navigate to the details page (add navigation here)
+        if (action == 'New User Registered') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => UserManagementScreen()),
+          );
+        } else if (action == 'Bill Generated') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BillingManagementScreen()),
+          );
+        } else if (action == 'Payment Received') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PaymentsScreen()),
+          );
+        } else if (action == 'Meter Reading Added') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MeterReadingScreen()),
+          );
+        }
       },
     );
   }
 
-  // Drawer with refined color scheme
+  // Drawer
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: ListView(
@@ -140,21 +168,57 @@ class DashboardScreen extends StatelessWidget {
             leading: const Icon(Icons.account_circle, color: Colors.blueAccent),
             title: const Text('Users', style: TextStyle(color: Colors.black87)),
             onTap: () {
-              // Navigate to Users page (add navigation here)
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserManagementScreen()),
+              );
             },
           ),
           ListTile(
             leading: const Icon(Icons.payment, color: Colors.blueAccent),
             title: const Text('Bills', style: TextStyle(color: Colors.black87)),
             onTap: () {
-              // Navigate to Bills page (add navigation here)
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BillingManagementScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications, color: Colors.blueAccent),
+            title: const Text('Notifications', style: TextStyle(color: Colors.black87)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotificationScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.monetization_on, color: Colors.blueAccent),
+            title: const Text('Payments', style: TextStyle(color: Colors.black87)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PaymentsScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.report, color: Colors.blueAccent),
+            title: const Text('Reports', style: TextStyle(color: Colors.black87)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ReportsScreen()),
+              );
             },
           ),
           ListTile(
             leading: const Icon(Icons.settings, color: Colors.blueAccent),
             title: const Text('Settings', style: TextStyle(color: Colors.black87)),
             onTap: () {
-              // Navigate to Settings page (add navigation here)
+              // You can add navigation for Settings if needed
             },
           ),
         ],
