@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({Key? key}) : super(key: key);
@@ -8,15 +10,32 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
-  final List<Map<String, String>> users = [
-    {"id": "1", "name": "Alice Johnson", "email": "alice@example.com", "status": "Active"},
-    {"id": "2", "name": "Bob Smith", "email": "bob@example.com", "status": "Inactive"},
-  ];
-
+  List<Map<String, String>> users = [];
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   String? _selectedUserId;
 
+Future<void> _fetchUsers() async {
+  final response = await http.get(Uri.parse('http://localhost/pure/get_users.php'));
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = json.decode(response.body);
+    setState(() {
+      users = data.map((user) {
+        return {
+          'id': user['id'].toString(),  // Ensure id is a String
+          'name': user['name'].toString(),  // Ensure name is a String
+          'email': user['email'].toString(),  // Ensure email is a String
+          'status': user['status'].toString(),  // Ensure status is a String
+        };
+      }).toList();
+    });
+  } else {
+    throw Exception('Failed to load users');
+  }
+}
+
+  // Add or Edit user
   void _addOrEditUser() {
     final String name = _nameController.text;
     final String email = _emailController.text;
@@ -46,12 +65,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     _resetForm();
   }
 
+  // Reset form
   void _resetForm() {
     _nameController.clear();
     _emailController.clear();
     _selectedUserId = null;
   }
 
+  // Edit user
   void _editUser(Map<String, String> user) {
     setState(() {
       _nameController.text = user["name"]!;
@@ -60,10 +81,17 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     });
   }
 
+  // Delete user
   void _deleteUser(String userId) {
     setState(() {
       users.removeWhere((user) => user["id"] == userId);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();  // Fetch users when the screen is initialized
   }
 
   @override
@@ -104,32 +132,34 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             const SizedBox(height: 20),
             // User List
             Expanded(
-              child: ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (context, index) {
-                  final user = users[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    child: ListTile(
-                      title: Text(user["name"]!),
-                      subtitle: Text(user["email"]!),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            onPressed: () => _editUser(user),
+              child: users.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: users.length,
+                      itemBuilder: (context, index) {
+                        final user = users[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          child: ListTile(
+                            title: Text(user["name"]!),
+                            subtitle: Text(user["email"]!),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  onPressed: () => _editUser(user),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () => _deleteUser(user["id"]!),
+                                ),
+                              ],
+                            ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _deleteUser(user["id"]!),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),
