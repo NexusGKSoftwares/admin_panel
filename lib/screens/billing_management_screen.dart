@@ -21,9 +21,10 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     _fetchBills();  // Fetch bills when the screen is loaded
   }
 
-  // Function to fetch bills from the API
+  // Function to fetch bills from the API based on user_id
   Future<void> _fetchBills() async {
-    final response = await http.get(Uri.parse('http://localhost/pure/get_user_bill.php'));
+    final userId = 1;  // Assuming you have a logged-in user ID, for example, userId = 1
+    final response = await http.get(Uri.parse('http://localhost/pure/get_user_bill.php?user_id=$userId'));
     
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -122,7 +123,11 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
       itemCount: displayedBills.length,
       itemBuilder: (context, index) {
         final bill = displayedBills[index];
-        return _buildBillingCard(bill['name'], double.parse(bill['amount_due']), bill['payment_status'], bill['due_date']);
+        return _buildBillingCard(
+            bill['name'], 
+            double.parse(bill['amount_due']), 
+            bill['payment_status'], 
+            bill['due_date']);
       },
     );
   }
