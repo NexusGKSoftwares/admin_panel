@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserManagementScreen extends StatefulWidget {
@@ -10,32 +10,40 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
-  List<Map<String, String>> users = [];
+  List<Map<String, String>> users = [];  // List to hold user data
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   String? _selectedUserId;
 
-Future<void> _fetchUsers() async {
-  final response = await http.get(Uri.parse('http://localhost/pure/get_users.php'));
+  // Fetch users from the server
+  Future<void> _fetchUsers() async {
+    final response = await http.get(Uri.parse('http://localhost/pure/get_users.php'));
 
-  if (response.statusCode == 200) {
-    List<dynamic> data = json.decode(response.body);
-    setState(() {
-      users = data.map((user) {
-        return {
-          'id': user['id'].toString(),  // Ensure id is a String
-          'name': user['name'].toString(),  // Ensure name is a String
-          'email': user['email'].toString(),  // Ensure email is a String
-          'status': user['status'].toString(),  // Ensure status is a String
-        };
-      }).toList();
-    });
-  } else {
-    throw Exception('Failed to load users');
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = json.decode(response.body);
+
+      if (data['success'] == true) {
+        List<dynamic> usersData = data['users'];
+
+        setState(() {
+          users = usersData.map<Map<String, String>>((user) {
+            return {
+              'id': user['id'].toString(),
+              'name': user['name']?.toString() ?? 'No Name',
+              'email': user['email']?.toString() ?? 'No Email',
+            };
+          }).toList();
+        });
+      } else {
+        throw Exception('Failed to load users');
+      }
+    } else {
+      throw Exception('Failed to load users');
+    }
   }
-}
 
-  // Add or Edit user
+  // Add or edit a user (currently just updates locally for now)
   void _addOrEditUser() {
     final String name = _nameController.text;
     final String email = _emailController.text;
@@ -48,31 +56,29 @@ Future<void> _fetchUsers() async {
           "id": _selectedUserId!,
           "name": name,
           "email": email,
-          "status": "Active",
         };
       });
     } else {
-      // Add new user
+      // Add new user (locally, ideally, you should call an API to add the user to the backend)
       setState(() {
         users.add({
           "id": DateTime.now().millisecondsSinceEpoch.toString(),
           "name": name,
           "email": email,
-          "status": "Active",
         });
       });
     }
     _resetForm();
   }
 
-  // Reset form
+  // Reset the form fields
   void _resetForm() {
     _nameController.clear();
     _emailController.clear();
     _selectedUserId = null;
   }
 
-  // Edit user
+  // Edit an existing user's details
   void _editUser(Map<String, String> user) {
     setState(() {
       _nameController.text = user["name"]!;
@@ -81,7 +87,7 @@ Future<void> _fetchUsers() async {
     });
   }
 
-  // Delete user
+  // Delete a user (for now, deletes only locally)
   void _deleteUser(String userId) {
     setState(() {
       users.removeWhere((user) => user["id"] == userId);
@@ -91,7 +97,7 @@ Future<void> _fetchUsers() async {
   @override
   void initState() {
     super.initState();
-    _fetchUsers();  // Fetch users when the screen is initialized
+    _fetchUsers();  // Fetch users when the screen is loaded
   }
 
   @override
@@ -132,34 +138,32 @@ Future<void> _fetchUsers() async {
             const SizedBox(height: 20),
             // User List
             Expanded(
-              child: users.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: users.length,
-                      itemBuilder: (context, index) {
-                        final user = users[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          child: ListTile(
-                            title: Text(user["name"]!),
-                            subtitle: Text(user["email"]!),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.blue),
-                                  onPressed: () => _editUser(user),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () => _deleteUser(user["id"]!),
-                                ),
-                              ],
-                            ),
+              child: ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    child: ListTile(
+                      title: Text(user["name"]!),
+                      subtitle: Text(user["email"]!),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => _editUser(user),
                           ),
-                        );
-                      },
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteUser(user["id"]!),
+                          ),
+                        ],
+                      ),
                     ),
+                  );
+                },
+              ),
             ),
           ],
         ),
