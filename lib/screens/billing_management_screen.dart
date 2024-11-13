@@ -95,21 +95,21 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.redAccent,
           ),
-          child: const Text('Unpaid'),
+          child: const Text('Unpaid Bills'),
         ),
         ElevatedButton(
           onPressed: () => _filterBills('Paid'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
           ),
-          child: const Text('Paid'),
+          child: const Text('Paid Bills'),
         ),
         ElevatedButton(
           onPressed: () => _filterBills('All'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blueAccent,
           ),
-          child: const Text('All'),
+          child: const Text('All Bills'),
         ),
       ],
     );
@@ -122,13 +122,13 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
       itemCount: displayedBills.length,
       itemBuilder: (context, index) {
         final bill = displayedBills[index];
-        return _buildBillingCard(bill['user'], bill['amount_due'], bill['payment_status']);
+        return _buildBillingCard(bill['name'], double.parse(bill['amount_due']), bill['payment_status'], bill['due_date']);
       },
     );
   }
 
   // Build each billing card for a user
-  Widget _buildBillingCard(String? user, double? amount, String? status) {
+  Widget _buildBillingCard(String? user, double amount, String status, String dueDate) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
@@ -140,7 +140,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
           ),
         ),
         title: Text(user ?? 'Unknown User', style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Amount: Kshs.${amount?.toStringAsFixed(2) ?? '0.00'}'),
+        subtitle: Text('Amount: \$${amount.toStringAsFixed(2)}\nDue Date: $dueDate'),
         trailing: ElevatedButton(
           onPressed: () {
             // TODO: Mark as paid or view details
