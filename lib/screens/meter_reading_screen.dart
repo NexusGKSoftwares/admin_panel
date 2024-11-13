@@ -24,7 +24,7 @@ class _MeterReadingScreenState extends State<MeterReadingScreen> {
   }
 
   Future<void> _fetchUsers() async {
-    const usersApiUrl = 'http://your-backend-url/get_users.php'; // Adjust to your endpoint
+    const usersApiUrl = 'http://localhost/pure/get_users.php'; // Adjust to your endpoint
 
     try {
       final response = await http.get(Uri.parse(usersApiUrl));
