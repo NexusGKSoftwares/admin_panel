@@ -45,7 +45,7 @@ class _MeterReadingScreenState extends State<MeterReadingScreen> {
     if (_formKey.currentState?.validate() ?? false && selectedUserId != null) {
       setState(() => _isSubmitting = true);
 
-      const apiUrl = 'http://your-backend-url/generate_bill.php';
+      const apiUrl = 'http://localhost/pure/generate_bill.php';
       final data = {
         'userId': selectedUserId,
         'previous_reading': _previousReadingController.text,
