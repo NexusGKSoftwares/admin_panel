@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class BillingManagementScreen extends StatefulWidget {
   const BillingManagementScreen({Key? key}) : super(key: key);
@@ -9,30 +11,47 @@ class BillingManagementScreen extends StatefulWidget {
 }
 
 class _BillingManagementScreenState extends State<BillingManagementScreen> {
-  List<Map<String, dynamic>> allBills = [
-    {'user': 'John Doe', 'amount': 150.75, 'status': 'Unpaid'},
-    {'user': 'Jane Smith', 'amount': 85.50, 'status': 'Paid'},
-    {'user': 'Bob Johnson', 'amount': 120.30, 'status': 'Unpaid'},
-  ];
-
+  List<Map<String, dynamic>> allBills = [];
   List<Map<String, dynamic>> displayedBills = [];
   String currentFilter = 'All';
 
   @override
   void initState() {
     super.initState();
-    displayedBills = List.from(allBills);
+    _fetchBills();  // Fetch bills when the screen is loaded
   }
 
+  // Function to fetch bills from the API
+  Future<void> _fetchBills() async {
+    final response = await http.get(Uri.parse('http://localhost/pure/get_user_bill.php'));
+    
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      
+      if (data['success'] == true) {
+        setState(() {
+          allBills = List<Map<String, dynamic>>.from(data['bills']);
+          displayedBills = List.from(allBills);  // Initially display all bills
+        });
+      }
+    } else {
+      // Handle error if the request fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to load bills")),
+      );
+    }
+  }
+
+  // Function to filter bills based on the status
   void _filterBills(String filter) {
     setState(() {
       currentFilter = filter;
       if (filter == 'Paid') {
-        displayedBills = allBills.where((bill) => bill['status'] == 'Paid').toList();
+        displayedBills = allBills.where((bill) => bill['payment_status'] == 'paid').toList();
       } else if (filter == 'Unpaid') {
-        displayedBills = allBills.where((bill) => bill['status'] == 'Unpaid').toList();
+        displayedBills = allBills.where((bill) => bill['payment_status'] == 'unpaid').toList();
       } else {
-        displayedBills = List.from(allBills);
+        displayedBills = List.from(allBills);  // Display all bills
       }
     });
   }
@@ -66,6 +85,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     );
   }
 
+  // Build filter options for Paid, Unpaid, and All bills
   Widget _buildFilterOptions() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -95,25 +115,27 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     );
   }
 
+  // Build list of displayed bills
   Widget _buildBillingList() {
     return ListView.builder(
       key: ValueKey<String>(currentFilter), // Unique key for AnimatedSwitcher
       itemCount: displayedBills.length,
       itemBuilder: (context, index) {
         final bill = displayedBills[index];
-        return _buildBillingCard(bill['user'], bill['amount'], bill['status']);
+        return _buildBillingCard(bill['user'], bill['amount_due'], bill['payment_status']);
       },
     );
   }
 
+  // Build each billing card for a user
   Widget _buildBillingCard(String? user, double? amount, String? status) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: status == 'Paid' ? Colors.green : Colors.redAccent,
+          backgroundColor: status == 'paid' ? Colors.green : Colors.redAccent,
           child: Icon(
-            status == 'Paid' ? Icons.check_circle : Icons.warning,
+            status == 'paid' ? Icons.check_circle : Icons.warning,
             color: Colors.white,
           ),
         ),
@@ -124,9 +146,9 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
             // TODO: Mark as paid or view details
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: status == 'Paid' ? Colors.green : Colors.redAccent,
+            backgroundColor: status == 'paid' ? Colors.green : Colors.redAccent,
           ),
-          child: Text(status == 'Paid' ? 'Paid' : 'Mark as Paid'),
+          child: Text(status == 'paid' ? 'Paid' : 'Mark as Paid'),
         ),
         onTap: () {
           // TODO: Show detailed bill information
