@@ -184,6 +184,16 @@ class DashboardScreen extends StatelessWidget {
               );
             },
           ),
+            ListTile(
+            leading: const Icon(Icons.payment, color: Colors.blueAccent),
+            title: const Text('Meter Reading', style: TextStyle(color: Colors.black87)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MeterReadingScreen()),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.notifications, color: Colors.blueAccent),
             title: const Text('Notifications', style: TextStyle(color: Colors.black87)),
