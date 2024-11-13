@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class BillingManagementScreen extends StatefulWidget {
   const BillingManagementScreen({Key? key}) : super(key: key);
 
   @override
-  _BillingManagementScreenState createState() =>
-      _BillingManagementScreenState();
+  _BillingManagementScreenState createState() => _BillingManagementScreenState();
 }
 
 class _BillingManagementScreenState extends State<BillingManagementScreen> {
@@ -18,31 +17,32 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchBills();  // Fetch all bills when the screen is loaded
+    fetchBillsFromBackend();
   }
 
-  // Function to fetch all bills from the API (Admin panel)
-  Future<void> _fetchBills() async {
-    final response = await http.get(Uri.parse('http://localhost/pure/get_all_bills.php'));
-    
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      
-      if (data['success'] == true) {
-        setState(() {
-          allBills = List<Map<String, dynamic>>.from(data['bills']);
-          displayedBills = List.from(allBills);  // Initially display all bills
-        });
+  Future<void> fetchBillsFromBackend() async {
+    try {
+      final response = await http.get(Uri.parse('http://localhost/pure/get_all_bills.php'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data["success"] == true && data["bills"] is List) {
+          setState(() {
+            allBills = List<Map<String, dynamic>>.from(data["bills"]);
+            displayedBills = List.from(allBills);
+          });
+        } else {
+          print("No bills available or data format invalid.");
+        }
+      } else {
+        print("Failed to load bills. Status code: ${response.statusCode}");
       }
-    } else {
-      // Handle error if the request fails
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to load bills")),
-      );
+    } catch (e) {
+      print("An error occurred while fetching bills: $e");
     }
   }
 
-  // Function to filter bills based on the payment status (Admin panel)
   void _filterBills(String filter) {
     setState(() {
       currentFilter = filter;
@@ -51,7 +51,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
       } else if (filter == 'Unpaid') {
         displayedBills = allBills.where((bill) => bill['payment_status'] == 'unpaid').toList();
       } else {
-        displayedBills = List.from(allBills);  // Display all bills
+        displayedBills = List.from(allBills);
       }
     });
   }
@@ -85,7 +85,6 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     );
   }
 
-  // Build filter options for Paid, Unpaid, and All bills
   Widget _buildFilterOptions() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -115,7 +114,6 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     );
   }
 
-  // Build list of displayed bills (Admin view)
   Widget _buildBillingList() {
     return ListView.builder(
       key: ValueKey<String>(currentFilter), // Unique key for AnimatedSwitcher
@@ -123,16 +121,21 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
       itemBuilder: (context, index) {
         final bill = displayedBills[index];
         return _buildBillingCard(
-            bill['name'], 
-            double.parse(bill['amount_due']), 
-            bill['payment_status'], 
-            bill['due_date']);
+          user: bill['name'] ?? bill['user'] ?? 'Unknown User',
+          amountDue: bill['amount_due'],
+          status: bill['payment_status'],
+          dueDate: bill['due_date'],
+        );
       },
     );
   }
 
-  // Build each billing card for a user (Admin panel)
-  Widget _buildBillingCard(String? user, double amount, String status, String dueDate) {
+  Widget _buildBillingCard({
+    required String user,
+    required String amountDue,
+    required String status,
+    required String dueDate,
+  }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
@@ -143,20 +146,17 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
             color: Colors.white,
           ),
         ),
-        title: Text(user ?? 'Unknown User', style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Amount: \$${amount.toStringAsFixed(2)}\nDue Date: $dueDate'),
+        title: Text(user, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text('Amount Due: \$$amountDue\nDue Date: $dueDate'),
         trailing: ElevatedButton(
           onPressed: () {
-            // TODO: Mark as paid or view details
+            // TODO: Handle mark as paid functionality here
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: status == 'paid' ? Colors.green : Colors.redAccent,
           ),
           child: Text(status == 'paid' ? 'Paid' : 'Mark as Paid'),
         ),
-        onTap: () {
-          // TODO: Show detailed bill information
-        },
       ),
     );
   }
