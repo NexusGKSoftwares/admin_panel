@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MeterReadingScreen extends StatefulWidget {
   const MeterReadingScreen({Key? key}) : super(key: key);
@@ -15,27 +17,55 @@ class _MeterReadingScreenState extends State<MeterReadingScreen> {
   Future<void> _submitReading() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isSubmitting = true);
-      
-      // Mock API call for demonstration, replace with real API call
-      await Future.delayed(const Duration(seconds: 2)); 
 
-      setState(() => _isSubmitting = false);
-      
-      // Show confirmation
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Meter Reading Submitted'),
-          content: const Text('Your meter reading has been successfully submitted.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+      // Replace with your backend API URL
+      const apiUrl = 'http://your-backend-url/generate_bill.php';
+
+      // Prepare request data
+      final Map<String, String> data = {
+        'userId': '1', // Replace with actual user ID
+        'previous_reading': '150', // Replace with actual previous reading
+        'current_reading': _currentReadingController.text,
+        'reading_date': DateTime.now().toString(), // Or your required date format
+      };
+
+      try {
+        // Make the POST request
+        final response = await http.post(
+          Uri.parse(apiUrl),
+          body: data,
+        );
+
+        // Handle response
+        final responseData = json.decode(response.body);
+        setState(() => _isSubmitting = false);
+
+        if (response.statusCode == 200 && responseData['success'] == true) {
+          _showMessage('Meter Reading Submitted', 'Your meter reading has been successfully submitted.');
+        } else {
+          _showMessage('Submission Failed', responseData['message'] ?? 'An error occurred.');
+        }
+      } catch (error) {
+        setState(() => _isSubmitting = false);
+        _showMessage('Error', 'Failed to submit the reading. Please try again.');
+      }
     }
+  }
+
+  void _showMessage(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
