@@ -95,21 +95,21 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.redAccent,
           ),
-          child: const Text('Unpaid Bills'),
+          child: const Text('Unpaid'),
         ),
         ElevatedButton(
           onPressed: () => _filterBills('Paid'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
           ),
-          child: const Text('Paid Bills'),
+          child: const Text('Paid'),
         ),
         ElevatedButton(
           onPressed: () => _filterBills('All'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blueAccent,
           ),
-          child: const Text('All Bills'),
+          child: const Text('All'),
         ),
       ],
     );
@@ -140,7 +140,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
           ),
         ),
         title: Text(user ?? 'Unknown User', style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Amount: \$${amount?.toStringAsFixed(2) ?? '0.00'}'),
+        subtitle: Text('Amount: Kshs.${amount?.toStringAsFixed(2) ?? '0.00'}'),
         trailing: ElevatedButton(
           onPressed: () {
             // TODO: Mark as paid or view details
