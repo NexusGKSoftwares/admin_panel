@@ -18,13 +18,12 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchBills();  // Fetch bills when the screen is loaded
+    _fetchBills();  // Fetch all bills when the screen is loaded
   }
 
-  // Function to fetch bills from the API based on user_id
+  // Function to fetch all bills from the API (Admin panel)
   Future<void> _fetchBills() async {
-    final userId = 1;  // Assuming you have a logged-in user ID, for example, userId = 1
-    final response = await http.get(Uri.parse('http://localhost/pure/get_user_bill.php?user_id=$userId'));
+    final response = await http.get(Uri.parse('http://localhost/pure/get_all_bills.php'));
     
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -43,7 +42,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     }
   }
 
-  // Function to filter bills based on the status
+  // Function to filter bills based on the payment status (Admin panel)
   void _filterBills(String filter) {
     setState(() {
       currentFilter = filter;
@@ -116,7 +115,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     );
   }
 
-  // Build list of displayed bills
+  // Build list of displayed bills (Admin view)
   Widget _buildBillingList() {
     return ListView.builder(
       key: ValueKey<String>(currentFilter), // Unique key for AnimatedSwitcher
@@ -132,7 +131,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
     );
   }
 
-  // Build each billing card for a user
+  // Build each billing card for a user (Admin panel)
   Widget _buildBillingCard(String? user, double amount, String status, String dueDate) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
