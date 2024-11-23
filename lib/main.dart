@@ -13,7 +13,7 @@ class AdminPanelApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(), // Start with the login screen
+      home: LoginScreen(),
     );
   }
 }
