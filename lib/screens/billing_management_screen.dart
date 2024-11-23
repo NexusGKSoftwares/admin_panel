@@ -147,7 +147,7 @@ class _BillingManagementScreenState extends State<BillingManagementScreen> {
           ),
         ),
         title: Text(user, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Amount Due: \$$amountDue\nDue Date: $dueDate'),
+        subtitle: Text('Amount Due: Kshs. $amountDue\nDue Date: $dueDate'),
         trailing: ElevatedButton(
           onPressed: () {
             // TODO: Handle mark as paid functionality here

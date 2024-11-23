@@ -26,7 +26,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Future<void> fetchNotifications() async {
     try {
       final response = await http.get(
-        Uri.parse('https://example.com/api/notifications'), // Replace with your API endpoint
+        Uri.parse('http://localhost/pure/get_notifications.php'), // Replace with your API endpoint
       );
 
       if (response.statusCode == 200) {
